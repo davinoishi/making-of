@@ -47,4 +47,5 @@ claude config  # not available here — edit .claude/settings.json directly
 ```
 
 Add a Stop hook that echoes a reminder to update MAKING-OF.md before the session closes. I can wire that up for one of your projects as a reference implementation if you want something to hand them.
+
 The one-line version for a kickoff prompt, if a coworker won't set up CLAUDE.md: "Create a MAKING-OF.md and append a dated session entry to it at the end of every session — record the wrong turns and disproved theories with receipts, not just the final answer, and never rewrite earlier entries."
