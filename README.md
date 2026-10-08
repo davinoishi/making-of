@@ -87,8 +87,15 @@ it blocks the stop once and tells Claude to append an entry, or to say in one li
 none is needed. It blocks again only if more changes follow, and it never fails a
 session: any error exits 0.
 
-Add to `~/.claude/settings.json` (user level, so it covers sessions started in any
-sub-folder; project settings files are not read from parent folders):
+**Install it with one command** (keeps your existing settings, backs the file up first,
+and does nothing if the hook is already there):
+
+```bash
+python3 hooks/install-hook.py --root ~/path/to/projects
+```
+
+It goes in `~/.claude/settings.json`, at user level, so it covers sessions started in any
+sub-folder; project settings files are not read from parent folders. By hand, the entry is:
 
 ```json
 {

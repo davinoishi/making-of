@@ -68,3 +68,20 @@ is the test.
 - Cloning this repo into the workspace failed: the session's sandbox refuses writes to
   any `.git/config` and `.git/hooks/`. The work was committed in a scratch clone, and
   Davin pushes it and clones it into `apps/making-of/`.
+
+## Session 3 — 8 Oct 2026: an installer, because "add this to settings.json" wasn't enough
+
+Session 2 ended by telling Davin to paste a `Stop` entry "into the `hooks` section" of
+`~/.claude/settings.json`. There was no `hooks` section: the file had never had a hook. An
+instruction to merge JSON by hand, into a file the instructions never showed, is a step
+for the person to get wrong.
+
+Also caught: the clone into `apps/making-of/` came out on `main` without the new work,
+because session 2 pushed a branch and the steps said to clone without saying to merge.
+Fixed with a fast-forward of the local `main`; it still needs a push.
+
+Added `hooks/install-hook.py`: loads the settings, adds the hook under `hooks.Stop`, keeps
+every other key, backs the file up, and refuses to touch invalid JSON. Tested on scratch
+files, all as expected: existing keys (`model`, `permissions`, a `PostToolUse` hook)
+kept; second run reports "Already installed" and writes nothing; missing file created;
+`{oops` left unchanged with exit 1; the installed command runs and exits 0.
