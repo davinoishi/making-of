@@ -4,7 +4,7 @@ A `MAKING-OF.md` is the running story of a project: what got decided, what got t
 what turned out to be wrong. This repo is the kit for making Claude Code keep one, every
 session, without being reminded.
 
-Three pieces, from cheapest to strongest:
+Three pieces to write them, from cheapest to strongest:
 
 1. **A CLAUDE.md block.** The rule. It loads into every session.
 2. **A seed file.** An empty convention gets ignored. A file that already exists, with a
@@ -12,7 +12,14 @@ Three pieces, from cheapest to strongest:
 3. **A Stop hook.** CLAUDE.md is a strong nudge, not a guarantee: a long session can end
    without the append. The hook makes it mechanical.
 
-Use all three. Running this since August 2026 across a dozen projects showed each one
+And two to use them, so the same lesson isn't learned a fourth time:
+
+4. **The lessons digest.** A script that collects every lesson, wrong theory and
+   correction from every making-of into one dated file.
+5. **The lessons sweep.** A skill that reviews the digest, finds the lessons learned in
+   three or more places, and stages rule proposals for you to adopt.
+
+Use all three of the first group. Running this since August 2026 across a dozen projects showed each one
 alone leaks: the rule sat in three projects' CLAUDE.md files and the other fifteen never
 saw it, and the projects that had it still skipped entries when a session ended on a
 quick fix.
@@ -133,6 +140,58 @@ Test it without a session:
 ```bash
 echo '{"session_id":"t","transcript_path":"/path/to/a/transcript.jsonl","stop_hook_active":false}' | python3 hooks/making-of-stop.py --root ~/path/to/projects
 ```
+
+## 4. Reading them back: the lessons digest
+
+A dozen making-ofs hold the same lesson learned three times, and nobody reads them side by
+side. [`lessons_digest.py`](lessons_digest.py) does: it walks a folder for every
+`MAKING-OF.md` / `making-of.md` (skipping `node_modules`, `.git`, `_archive` and
+`.claude/worktrees`), pulls out each passage marked `The lesson`, `WRONG THEORY` or
+`Correction to`, and writes a dated digest grouped by project.
+
+```bash
+python3 -I lessons_digest.py ~/path/to/projects --out-dir ~/path/to/learnings
+```
+
+- **Cited by heading, not line number.** Each passage is tied to the `##` heading it sits
+  under (Act N, Session N, or the heading's own text), found by parsing the file.
+  Mapping grep line numbers to acts by eye is how citations go wrong.
+- **What's new since last time.** Each digest ends with a manifest of passage ids; the
+  next run lists the passages that weren't in it, dated or not.
+- **Optional evidence table.** `--signatures FILE` takes error-signature counts you paste
+  from a transcript search (`count | query | last seen | note`, one per line) and shows,
+  for each, the making-of passages that mention it. `--rules CLAUDE.md` (repeatable) adds
+  whether a rule file already covers it.
+- Standard library only, no network, no model. Same files in, same digest out. Deciding
+  which lessons become rules is section 5.
+
+## 5. Closing the loop: the lessons sweep
+
+[`skills/lessons-sweep/SKILL.md`](skills/lessons-sweep/SKILL.md) turns a digest into rule
+changes, in three stages:
+
+1. **Collect.** Runs the digest. Optionally re-counts error strings from a session
+   transcript search, because the failures that recur most (an unquoted glob, a sandbox
+   refusal) are the ones nobody writes up.
+2. **Review.** Clusters lessons that say the same thing, and proposes a rule only for one
+   learned independently in **three or more projects or sessions** that no rule file
+   already covers. At most four per sweep. Each proposal comes with its exact text and
+   target file, written to a dated report in your learnings folder.
+3. **Adopt.** Nothing changes until you name the proposals you want. They're applied
+   verbatim, checked by script, and recorded in the report. Rules adopted at earlier
+   sweeps are checked too: if a rule's error count hasn't fallen, the next sweep proposes
+   a hook instead of more words.
+
+Install it as a user-level skill:
+
+```bash
+cp -R skills/lessons-sweep ~/.claude/skills/lessons-sweep
+```
+
+Then ask Claude to "run the lessons sweep", giving the projects folder, a learnings folder
+(**not** inside a public repo: digests quote your making-ofs), your rule files and this
+checkout's path. Every two weeks is a good cadence; as a scheduled task that only fires
+weekly, have it stop unless the last digest is at least 13 days old.
 
 ## Lessons from running it
 
