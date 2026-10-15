@@ -188,3 +188,7 @@ failed with zsh's `no matches found`, the unquoted-glob failure the workspace's 
 a line about this morning, and the one the new skill warns about too.
 
 Not done: nothing committed or pushed.
+
+**Committed and pushed, same day.** On Davin's go-ahead: `c522422` on `main` (5 files, +921/−2),
+pushed to `davinoishi/making-of`; `git ls-remote origin refs/heads/main` returns the same SHA.
+This line is the only change after that commit.
